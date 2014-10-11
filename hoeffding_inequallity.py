@@ -20,13 +20,14 @@ def avg(a_list):
 
 TOTAL_COINs = 1000
 FLIP_TIMEs = 10
-EXP_TIMEs = 100000
+EXP_TIMEs = 10000
 
 coins = [0 for _ in range(TOTAL_COINs)]
 minimums = [0 for _ in range(EXP_TIMEs)]
 randoms = [0 for _ in range(EXP_TIMEs)]
 firsts = [0 for _ in range(EXP_TIMEs)]
 for e in range(EXP_TIMEs):
+    print(e)
     for c in range(TOTAL_COINs):
         for f in range(FLIP_TIMEs):
             if random.randint(0, 1):

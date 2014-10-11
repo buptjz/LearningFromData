@@ -65,6 +65,19 @@ class LinearRegression:
         return 1.0 - correct * 1.0 / self.__N_test
 
 
+def generate_nonlinear_data(n):
+    X = np.random.rand(n, 3) * 2 - 1
+    X[:, 0] = 1
+
+    #f(x1,x2)=sign(x21 +x22 −0.6)
+    Y = np.zeros((X.shape[0], 1))
+    for row in range(X.shape[0]):
+        Y[row, 0] = X[row, 1] * X[row, 1] + X[row, 2] * X[row, 2] - 0.6
+    Y[Y >= 0] = 1
+    Y[Y < 0] = -1
+    Y = np.int16(Y)
+    return X, Y
+
 def generate_date(n):
     #generate target function (represented by vector w)
     p1 = [random.uniform(-1, 1), random.uniform(-1, 1)]
@@ -151,6 +164,31 @@ def nonlinear_exp():
     probability of picking each x ∈ X . Generate simulated noise by flipping the sign of the
     output in a random 10% subset of the generated training set.
     """
+    EXP_TIMEs = 1000
+    train_num = 1000
+    test_num = 1000
+    e_out_list = []
+    for e in range(EXP_TIMEs):
+        print(e)
+        X, Y = generate_nonlinear_data(train_num + test_num)
+        X_trans = np.zeros((X.shape[0], 6))
+        for row in range(Y.shape[0]):
+            X_trans[row, 0:3] = X[row, :]
+            X_trans[row, 3] = X[row, 1] * X[row, 2]
+            X_trans[row, 4] = X[row, 1] * X[row, 1]
+            X_trans[row, 5] = X[row, 2] * X[row, 2]
+            if random.randint(1, 10) == 1:
+                # 10% to be wrong on original data
+                Y[row, 0] = -Y[row, 0]
+        X_train = X_trans[:train_num, :]
+        X_test = X_trans[train_num:, :]
+        Y_train = Y[:train_num, :]
+        Y_test = Y[train_num:, :]
+
+        lr = LinearRegression(X_train, Y_train, X_test, Y_test)
+        lr.learn_w()
+        e_out_list.append(lr.evaluate_error_out())
+    print(avg(e_out_list))
 
 
 if __name__ == "__main__":
