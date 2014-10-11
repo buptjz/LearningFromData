@@ -2,6 +2,8 @@
 __author__ = 'wangjz'
 
 """
+Learning From Data
+HW 1
 Run a computer simulation for flipping 1,000 virtual fair coins. Flip each coin independently 10 times.
 Focus on 3 coins as follows: c1 is the first coin flipped, crand is a coin chosen randomly from the 1,000,
 and cmin is the coin which had the minimum frequency of heads (pick the earlier one in case of a tie). Let ν1,
