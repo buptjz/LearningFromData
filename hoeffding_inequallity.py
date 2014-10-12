@@ -22,20 +22,20 @@ TOTAL_COINs = 1000
 FLIP_TIMEs = 10
 EXP_TIMEs = 10000
 
-coins = [0 for _ in range(TOTAL_COINs)]
 minimums = [0 for _ in range(EXP_TIMEs)]
 randoms = [0 for _ in range(EXP_TIMEs)]
 firsts = [0 for _ in range(EXP_TIMEs)]
 for e in range(EXP_TIMEs):
     print(e)
+    coins = [0 for _ in range(TOTAL_COINs)]
     for c in range(TOTAL_COINs):
         for f in range(FLIP_TIMEs):
             if random.randint(0, 1):
                 coins[c] += 1
     minimums[e] = min(coins)
-    randoms[e] = coins[random.randint(0, TOTAL_COINs-1)]
-    firsts[e] = coins[0]
+    # randoms[e] = coins[random.randint(0, TOTAL_COINs-1)]
+    # firsts[e] = coins[0]
 
 print(avg(minimums))
-print(avg(randoms))
-print(avg(firsts))
+# print(avg(randoms))
+# print(avg(firsts))
