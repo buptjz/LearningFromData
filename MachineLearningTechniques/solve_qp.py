@@ -16,8 +16,9 @@ and numerically solve for them
 (you can use any package you want). Which of the followings are true about the optimal α?
 '''
 
+
 '''
-K(x,x′)=(1+xTx′)2,
+kernel function K(x,x′)=(1+xTx′)2,
 '''
 def cus_kernel(v1, v2):
     return pow((1 + dot(v1, v2)), 2)
