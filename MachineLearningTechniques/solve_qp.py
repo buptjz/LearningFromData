@@ -35,8 +35,11 @@ X = matrix([
     [-2.0, 0.0]
     ])
 
+print X
+
 #构造y 列向量
 y = matrix([-1.0, -1.0, -1.0, 1.0, 1.0, 1.0, 1.0])
+print y
 
 #构造Q，就是这里的P
 Q = matrix(0.0, (N, N))
@@ -60,7 +63,15 @@ c = matrix(0.0, (N + 2, 1))
 
 #不需要等式约束，所以没有这里的A和b
 
-#求解
+#求解，看起来有5个非0的α
 res = qp(Q, pbar, A, c)['x']
 print res
-print sum(res)
+# print sum(res)
+
+#选取第二个α来求解b
+chosen = 2
+sum = 0
+for i in range(N):
+    sum += res[i] * y[i] * cus_kernel(X[:, chosen], X[:, i])
+
+print "b", y[chosen] - sum
