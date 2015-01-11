@@ -57,6 +57,12 @@
             ReferencedContainer = "container:svm_proj.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
+      <CommandLineArguments>
+         <CommandLineArgument
+            argument = "/Volumes/BigData/Developer/LearningFromData/MachineLearningTechniques/data/format.train8 format.train8.model format.train8.predict"
+            isEnabled = "YES">
+         </CommandLineArgument>
+      </CommandLineArguments>
       <AdditionalOptions>
       </AdditionalOptions>
    </LaunchAction>

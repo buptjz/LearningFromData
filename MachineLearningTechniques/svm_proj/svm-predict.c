@@ -53,6 +53,14 @@ void predict(FILE *input, FILE *output)
 	int nr_class=svm_get_nr_class(model);
 	double *prob_estimates=NULL;
 	int j;
+    
+    //添加统计每个class正确率
+    int *num_perClass = (int *)malloc(sizeof(int) * model->nr_class);
+    int *right_perClass = (int *)malloc(sizeof(int) * model->nr_class);
+    for (int i = 0 ; i < model->nr_class; i++) {
+        *(num_perClass + i) = 0;
+        *(right_perClass + i) = 0;
+    }
 
 	if(predict_probability)
 	{
@@ -85,6 +93,10 @@ void predict(FILE *input, FILE *output)
 			exit_input_error(total+1);
 
 		target_label = strtod(label,&endptr);
+        
+        //当前label数量加1
+        *(num_perClass + (int)target_label) += 1;
+        
 		if(endptr == label || *endptr != '\0')
 			exit_input_error(total+1);
 
@@ -102,14 +114,16 @@ void predict(FILE *input, FILE *output)
 			if(val == NULL)
 				break;
 			errno = 0;
-			x[i].index = (int) strtol(idx,&endptr,10);
+            int tmp_int = (int) strtol(idx,&endptr,10);
+            x[i].index = tmp_int;
 			if(endptr == idx || errno != 0 || *endptr != '\0' || x[i].index <= inst_max_index)
 				exit_input_error(total+1);
 			else
 				inst_max_index = x[i].index;
 
 			errno = 0;
-			x[i].value = strtod(val,&endptr);
+            double tmp_val = strtod(val,&endptr);
+            x[i].value = tmp_val;
 			if(endptr == val || errno != 0 || (*endptr != '\0' && !isspace(*endptr)))
 				exit_input_error(total+1);
 
@@ -131,8 +145,10 @@ void predict(FILE *input, FILE *output)
 			fprintf(output,"%g\n",predict_label);
 		}
 
-		if(predict_label == target_label)
-			++correct;
+        if(predict_label == target_label){
+            *(right_perClass + (int)target_label) += 1;
+            ++correct;
+        }
 		error += (predict_label-target_label)*(predict_label-target_label);
 		sump += predict_label;
 		sumt += target_label;
@@ -141,6 +157,12 @@ void predict(FILE *input, FILE *output)
 		sumpt += predict_label*target_label;
 		++total;
 	}
+    
+    for (int i = 0; i < model->nr_class; i++) {
+        printf("class %d : %f (%d/%d) \n",i,(float) *(right_perClass+i)/ (float) *(num_perClass+i),
+               *(right_perClass+i),*(num_perClass+i));
+    }
+    
 	if (svm_type==NU_SVR || svm_type==EPSILON_SVR)
 	{
 		info("Mean squared error = %g (regression)\n",error/total);

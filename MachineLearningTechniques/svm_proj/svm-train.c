@@ -103,6 +103,24 @@ int main(int argc, char **argv)
 	else
 	{
 		model = svm_train(&prob,&param);
+        
+        /*Calculate W,应急处理数据是2维情况下的W的计算，根据是
+         https://class.coursera.org/ntumltwo-001/forum/thread?thread_id=104
+         http://www.csie.ntu.edu.tw/~cjlin/libsvm/faq.html#f804
+         TODO 能够计算全部的W
+         
+         这里的SVs是一个l*2的数组，l表示support vector的数量，2表示的每一个点的维度
+         而sv_coef是一个 （k-1）*l大小的数据，k表示的是 分类的数量，二分类，则sv_coef[0,l]
+         */
+        struct svm_node ** SVs = model->SV;
+        double W1 = 0, W2 = 0;
+        for (int i = 0; i < model->l; i++) {
+//            struct svm_node sv = SVs[i][1];
+            W1 += SVs[i][0].value * model->sv_coef[0][i];
+            W2 += SVs[i][1].value * model->sv_coef[0][i];
+        }
+        printf("W1 = %f\nW2 = %f\n|W| = %f\n", W1, W2, W1 * W1 + W2* W2);
+        
 		if(svm_save_model(model_file_name,model))
 		{
 			fprintf(stderr, "can't save model to file %s\n", model_file_name);
