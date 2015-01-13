@@ -4,6 +4,7 @@
 #include <ctype.h>
 #include <errno.h>
 #include "svm.h"
+#include <math.h>
 #define Malloc(type,n) (type *)malloc((n)*sizeof(type))
 
 void print_null(const char *s) {}
@@ -119,7 +120,19 @@ int main(int argc, char **argv)
             W1 += SVs[i][0].value * model->sv_coef[0][i];
             W2 += SVs[i][1].value * model->sv_coef[0][i];
         }
-        printf("W1 = %f\nW2 = %f\n|W| = %f\n", W1, W2, W1 * W1 + W2* W2);
+        printf("W1 = %f\nW2 = %f\n|W| = %f\n", W1, W2,sqrt(W1 * W1 + W2* W2));
+        
+        /*计算sum_alpha = model.sv_coef' * [y(model.sv_indices)]*/
+        int *indices = model->sv_indices;
+        int label;
+        double sum_alpha = 0;
+        for (int i = 0; i < model->l; i++) {
+            label = (int)prob.y[indices[i]];
+            label = label == 0 ? -1 : 1;
+//            printf("%d\t%f\t%d\n",indices[i],model->sv_coef[0][i],label);
+            sum_alpha += model->sv_coef[0][i] * label;
+        }
+        printf("sum_alpha = %f\n", sum_alpha);
         
 		if(svm_save_model(model_file_name,model))
 		{

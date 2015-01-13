@@ -5,8 +5,8 @@ __author__ = 'wangjz'
 
 need_ind = "8"
 
-in_file = "./data/format.train"
-out_file = "./data/format.train" + need_ind
+in_file = "./data/format.test"
+out_file = "./data/format.test" + need_ind
 
 f = open(in_file)
 lines = f.readlines()

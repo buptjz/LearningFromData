@@ -59,7 +59,7 @@
       </BuildableProductRunnable>
       <CommandLineArguments>
          <CommandLineArgument
-            argument = "/Volumes/BigData/Developer/LearningFromData/MachineLearningTechniques/data/format.train8 format.train8.model format.train8.predict"
+            argument = "/Volumes/BigData/Developer/LearningFromData/MachineLearningTechniques/data/format.test4 format.train4.model format.train4.predict"
             isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>
