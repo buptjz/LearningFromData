@@ -6,7 +6,7 @@ root=/Volumes/BigData/Developer/LearningFromData/MachineLearningTechniques/data/
 for num in 0 2 4 6 8    
 do
     model=format.train${num}
-    $train_bin -t 1 -d 2 -g 1 -r 1 -c 0.01 ${root}${model} ${root}${model}
+    $train_bin -t 1 -d 2 -g 1 -r 1 -c 0.01 ${root}${model} ${root}${model}_model
 done
 
 #predict command

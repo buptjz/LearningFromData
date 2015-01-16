@@ -3,10 +3,10 @@ __author__ = 'wangjz'
 
 '''分解问题'''
 
-need_ind = "8"
+need_ind = "0"
 
-in_file = "./data/format.test"
-out_file = "./data/format.test" + need_ind
+in_file = "./data/format.train"
+out_file = "./data/format.train" + need_ind
 
 f = open(in_file)
 lines = f.readlines()
