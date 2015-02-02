@@ -53,13 +53,10 @@ def update_u_alpha(Y_predict, Y, u):
 
     coeff_incorrect = np.sqrt((1 - epsilon) / epsilon)
     coeff_correct = np.sqrt(epsilon / (1 - epsilon))
-    print "coeff_incorrect %f" % coeff_incorrect
-    print "coeff_correct %f" % coeff_correct
-    print "epsilon = %f" % epsilon
 
     # the coef's applied to u
     coef = [coeff_incorrect if err else coeff_correct for err in errs]
-    print "sum_u = %f" % np.sum(u * coef)
+    
     # (new u, alpha, epsilon)
     return (u * coef, np.log(coeff_incorrect), epsilon)
     
@@ -68,14 +65,14 @@ def update_u_alpha(Y_predict, Y, u):
 # ===========
 if __name__ == '__main__':
 
-    train = load_file('./data/hw2_adaboost_train.dat')
+    train = load_file('../data/hw2_adaboost_train.dat')
     m = len(train)          # number of training examples
     d = train.shape[1] - 1  # feature dimension
 
     X_train = train[:, :-1]
     Y_train = train[:, -1].astype(int)
 
-    test = load_file('./data/hw2_adaboost_test.dat')
+    test = load_file('../data/hw2_adaboost_test.dat')
     m_test = len(test)
     X_test = test[:, :-1]
     Y_test = test[:, -1].astype(int)
@@ -107,7 +104,6 @@ if __name__ == '__main__':
             train_sorted = train[sortidx]
             u_sorted = u[sortidx]
             sum_u_sorted = sum(u_sorted)
-            # print u_sorted
 
             # acc[n] = sum of [u_0 * y_0, u_n * y_n)
             # n = 0 .. m
@@ -124,7 +120,7 @@ if __name__ == '__main__':
             # err = sum(0.5 * u[i] * (1 - y[i])) + sum(0.5 * u[j] * (1 + y[j]))
             #     = sum(0.5 * u[k]) - sum(0.5 * u[i] * y[i]) + sum(0.5 * u[j] * y[j])
             err_neg = np.array([0.5 * (-acc[split] + sum_u_sorted + (acc[m] - acc[split])) for split in range(m)])
-            # print err_neg
+
             err_pos_argmin = np.argmin(err_pos)
             err_neg_argmin = np.argmin(err_neg)
 
@@ -169,8 +165,7 @@ if __name__ == '__main__':
             print
 
         u, alpha, epsilon = update_u_alpha(Y_predict, Y_train, u)
-        if t == 2:
-            print u
+
         # epsilons are just for question 16
         epsilons.append(epsilon)
 
