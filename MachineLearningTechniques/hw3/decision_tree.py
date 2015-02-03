@@ -106,7 +106,7 @@ def build_dt(X, Y):
     #base case 1: all yn the same: impurity = 0,gt(x) = yn
     if len(set(Y)) == 1:
         leave_node = DT_Node()
-        leave_node.label = set(Y)
+        leave_node.label = Y[0]
         return leave_node
 
     #all xn the same: no decision stumps, gt(x) = majority of yn
@@ -126,6 +126,21 @@ def build_dt(X, Y):
         return node
 
 
+def print_tree(root, spaces):
+    global num_nodes
+
+    indendent = spaces * "\t"
+    if root.label:#leave node
+        print "%s+%d" % (indendent, root.label)
+        return
+    else:
+        num_nodes += 1
+        print "%s%f(%d)" % (spaces * "\t", root.thres, root.axis)
+    print_tree(root.left, spaces + 2)
+    print_tree(root.right, spaces + 2)
+
+
+num_nodes = 0
 if __name__ == '__main__':
     train_file = "hw3_train.dat"
     test_file = "hw3_test.dat"
@@ -138,4 +153,12 @@ if __name__ == '__main__':
     # plot_sign(X_train,Y_train)
     # plt.show()
 
-    dt = build_dt(X_train,Y_train)
+    dec_tree = build_dt(X_train,Y_train)
+
+    #How many internal nodes (branching functions) are there in the resulting tree G?
+    print_tree(dec_tree, 0)
+    print '----------------------------------------'
+    print '         Homework 3 Question 13         '
+    print '----------------------------------------'
+    print 'How many internal nodes:'
+    print num_nodes
