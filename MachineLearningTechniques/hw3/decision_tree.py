@@ -95,7 +95,7 @@ def all_same_rows(X):
     return True
 
 
-def build_dt(X, Y):
+def build_decision_tee(X, Y):
     '''
     Building decision tree recursively
     datas: a list of datas
@@ -121,44 +121,77 @@ def build_dt(X, Y):
         node = DT_Node(axis, thres)
         left_X, left_Y = datas_below(X, Y, axis, thres)
         right_X, right_Y = datas_above(X, Y, axis, thres)
-        node.left = build_dt(left_X, left_Y)
-        node.right = build_dt(right_X, right_Y)
+        node.left = build_decision_tee(left_X, left_Y)
+        node.right = build_decision_tee(right_X, right_Y)
         return node
 
 
-def print_tree(root, spaces):
+def predict_y(dtree, x):
+    '''Given a decision tree, predict the label of x'''
+    assert dtree
+    if dtree.label:
+        return dtree.label
+    else:
+        if x[dtree.axis] < dtree.thres:
+            return predict_y(dtree.left, x)
+        else:
+            return predict_y(dtree.right, x)
+
+
+def print_tree(dtree, spaces):
     global num_nodes
 
     indendent = spaces * "\t"
-    if root.label:#leave node
-        print "%s+%d" % (indendent, root.label)
+    if dtree.label:#leave node
+        print "%s+%d" % (indendent, dtree.label)
         return
     else:
         num_nodes += 1
-        print "%s%f(%d)" % (spaces * "\t", root.thres, root.axis)
-    print_tree(root.left, spaces + 2)
-    print_tree(root.right, spaces + 2)
+        print "%s%f(%d)" % (spaces * "\t", dtree.thres, dtree.axis)
+    print_tree(dtree.left, spaces + 2)
+    print_tree(dtree.right, spaces + 2)
 
 
 num_nodes = 0
 if __name__ == '__main__':
     train_file = "hw3_train.dat"
     test_file = "hw3_test.dat"
-    X_train, Y_train= load_file(train_file)
-    m = X_train.shape[0]    # number of training examples
-    d = X_train.shape[1]    # feature dimension
+    X_train, Y_train = load_file(train_file)
+    N = X_train.shape[0]# num of training examples
 
     # # let's plot the decision function
     # plt.figure()
     # plot_sign(X_train,Y_train)
     # plt.show()
 
-    dec_tree = build_dt(X_train,Y_train)
+    dtree = build_decision_tee(X_train, Y_train)
 
-    #How many internal nodes (branching functions) are there in the resulting tree G?
-    print_tree(dec_tree, 0)
+    #Q13 : How many internal nodes (branching functions) are there in the resulting tree G?
+    print_tree(dtree, 0)
     print '----------------------------------------'
     print '         Homework 3 Question 13         '
     print '----------------------------------------'
     print 'How many internal nodes:'
     print num_nodes
+
+    #Q14 : Which of the following is closest to the Ein (evaluated with 0/1 error) of the tree?
+    Predicts_train = [predict_y(dtree, x)for x in X_train]
+    num_wrong = N - sum(Predicts_train == Y_train)
+    print '----------------------------------------'
+    print '         Homework 3 Question 14         '
+    print '----------------------------------------'
+    print 'Ein (evaluated with 0/1 error):'
+    print  float(num_wrong) / N
+
+    #Q15 : Which of the following is closest to the Eout (evaluated with 0/1 error) of the tree?
+    X_test, Y_test = load_file(test_file)
+    Predicts_test = [predict_y(dtree, x)for x in X_test]
+    N = X_test.shape[0]
+    num_wrong = N - sum(Predicts_test == Y_test)
+    print '----------------------------------------'
+    print '         Homework 3 Question 15         '
+    print '----------------------------------------'
+    print 'Eout (evaluated with 0/1 error):'
+    print  float(num_wrong) / N
+
+    
