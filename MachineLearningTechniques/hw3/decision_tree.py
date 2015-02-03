@@ -148,12 +148,6 @@ if __name__ == '__main__':
     test_file = "hw3_test.dat"
     X_train, Y_train = load_file(train_file)
     N = X_train.shape[0]# num of training examples
-
-    # # let's plot the decision function
-    # plt.figure()
-    # plot_sign(X_train,Y_train)
-    # plt.show()
-
     dtree = build_decision_tee(X_train, Y_train)
 
     #Q13 : How many internal nodes (branching functions) are there in the resulting tree G?
@@ -183,3 +177,21 @@ if __name__ == '__main__':
     print '----------------------------------------'
     print 'Eout (evaluated with 0/1 error):'
     print  float(num_wrong) / N
+
+    #Show the decision boundary and training points
+    start = 0
+    end = 1
+    npoints = 500
+    xrange = np.linspace(start, end, npoints)
+    yrange = np.linspace(start, end, npoints)
+    xgrid, ygrid = np.meshgrid(xrange,yrange)
+
+    X = np.array([xgrid.reshape(npoints * npoints), ygrid.reshape(npoints * npoints)]).T
+    labels = [predict_y(dtree,x) for x in X]
+    zgrid = np.array(labels).reshape(npoints, npoints)
+    plt.figure()
+    plt.title('Decision Tree')
+    plot_sign(X_train,Y_train)
+    plt.pcolor(xgrid, ygrid, zgrid)
+    plt.show()
+    '''We can see overfit obviously!!'''
