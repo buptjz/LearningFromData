@@ -142,7 +142,7 @@ def print_tree(dtree, spaces):
     print_tree(dtree.right, spaces + 2)
 
 
-def build_random_forest(T, Nchoose, X_train, Y_train):
+def build_random_forest(T, Nchoose, X_train, Y_train, build_tree_func=build_decision_tree):
     '''
     Random forest (RF) = bagging + fully-grown C&RT decision tree
     T: num of decision trees
@@ -154,9 +154,39 @@ def build_random_forest(T, Nchoose, X_train, Y_train):
         randidx = (100 * np.random.random(size=Nchoose)).astype(int)
         X_train_chosen = X_train[randidx, :]
         Y_train_chosen = Y_train[randidx]
-        dt = build_decision_tree(X_train_chosen,Y_train_chosen)
+        dt = build_tree_func(X_train_chosen,Y_train_chosen)
         dtrees.append(dt)
     return dtrees
+
+
+def build_decision_tree_with_prune(X, Y):
+    '''
+    Building decision tree with prune by restricting it to have one branch only.
+    datas: a list of datas
+    '''
+    #base case 1: all yn the same: impurity = 0,gt(x) = yn
+    if len(set(Y)) == 1:
+        leave_node = DT_Node()
+        leave_node.label = Y[0]
+        return leave_node
+    #all xn the same: no decision stumps, gt(x) = majority of yn
+    elif all_same_rows(X):
+        leave_node = DT_Node()
+        leave_node.label = majority_item(Y)
+        return leave_node
+    #common case
+    else:
+        axis, thres = decide_branch(X, Y)
+        node = DT_Node(axis, thres)
+        left_X, left_Y = datas_below(X, Y, axis, thres)
+        right_X, right_Y = datas_above(X, Y, axis, thres)
+
+        left_node, right_node = DT_Node(), DT_Node()
+        left_node.label, right_node.label = majority_item(left_Y), majority_item(right_Y)
+        node.left = left_node
+        node.right = right_node
+        return node
+
 
 num_nodes = 0
 def main():
@@ -193,30 +223,31 @@ def main():
     print 'Eout (evaluated with 0/1 error):'
     print  float(num_wrong) / X_test.shape[0]
 
-    # #[SHOW] Plot the decision boundary and training points
-    # start = 0
-    # end = 1
-    # npoints = 500
-    # xrange = np.linspace(start, end, npoints)
-    # yrange = np.linspace(start, end, npoints)
-    # xgrid, ygrid = np.meshgrid(xrange,yrange)
-    #
-    # X = np.array([xgrid.reshape(npoints * npoints), ygrid.reshape(npoints * npoints)]).T
-    # labels = [predict_y(dtree,x) for x in X]
-    # zgrid = np.array(labels).reshape(npoints, npoints)
-    # plt.figure()
-    # plt.title('Decision Tree')
-    # plot_sign(X_train,Y_train)
-    # plt.pcolor(xgrid, ygrid, zgrid)
-    # plt.show()
-    # '''We can see overfit obviously!!'''
+    #[SHOW] Plot the decision boundary and training points
+    start = 0
+    end = 1
+    npoints = 500
+    xrange = np.linspace(start, end, npoints)
+    yrange = np.linspace(start, end, npoints)
+    xgrid, ygrid = np.meshgrid(xrange,yrange)
+
+    X = np.array([xgrid.reshape(npoints * npoints), ygrid.reshape(npoints * npoints)]).T
+    labels = [predict_y(dtree,x) for x in X]
+    zgrid = np.array(labels).reshape(npoints, npoints)
+    plt.figure()
+    plt.title('Decision Tree')
+    plot_sign(X_train,Y_train)
+    plt.pcolor(xgrid, ygrid, zgrid)
+    plt.show()
+    '''We can see overfit obviously!!'''
 
 
     # Q16,17,18:Produce Random Forest with bagging. N'= N,T=300, repeat the experiment for 100 times
     REPEAT = 100
     T = 300
-    random_forests_list = [build_random_forest(T, N, X_train, Y_train) for i in range(REPEAT)]
 
+    # Uncomment line below to use basic random forest
+    random_forests_list = [build_random_forest(T, N, X_train, Y_train) for i in range(REPEAT)]
     print '----------------------------------------'
     print '         Homework 3 Question 16         '
     print '----------------------------------------'
@@ -229,8 +260,12 @@ def main():
             eins_30000.append(float(nwrong) / N)
     print np.average(eins_30000)
 
+    # Uncomment line below to use random forest with pruned decision tree
+    random_forests_list = \
+        [build_random_forest(T, N, X_train, Y_train, build_decision_tree_with_prune) for i in range(REPEAT)]
+
     print '----------------------------------------'
-    print '         Homework 3 Question 17,18      '
+    print '  Homework 3 Question 17,18(19,20)      '
     print '----------------------------------------'
 
     rf_eins_100, rf_eouts_100 = [], []#keep track of the eins and eouts
@@ -255,9 +290,9 @@ def main():
 
 
 if __name__ == '__main__':
-    # import cProfile
-    # cProfile.run("main()", 'result')
-    # import pstats
-    # p = pstats.Stats("result")
-    # p.strip_dirs().sort_stats("cumulative").print_stats()
-    main()
+    import cProfile
+    cProfile.run("main()", 'result')
+    import pstats
+    p = pstats.Stats("result")
+    p.strip_dirs().sort_stats("cumulative").print_stats()
+    # main()
